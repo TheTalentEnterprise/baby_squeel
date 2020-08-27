@@ -1,8 +1,9 @@
 module BabySqueel
   class Resolver
-    def initialize(table, strategies)
+    def initialize(table, strategies, extra_names={})
       @table       = table
       @strategies  = strategies
+      @extra_names = extra_names
     end
 
     # Attempt to determine the intent of the method_missing. If this method
@@ -11,6 +12,10 @@ module BabySqueel
     # 1. The argument signature is invalid.
     # 2. The name of the method called is not valid (ex. invalid column name)
     def resolve(name, *args, &block)
+      if args.length == 0 && @extra_names.include?(name)
+        return @extra_names[name]
+      end
+
       strategy = @strategies.find do |strategy|
         valid?(strategy, name, *args, &block)
       end
@@ -47,6 +52,10 @@ module BabySqueel
       end
     end
 
+    def allows?(strategy)
+      @strategies.include?(strategy)
+    end
+
     private
 
     def build(strategy, name, *args)
@@ -55,6 +64,18 @@ module BabySqueel
         @table.func(name, *args)
       when :association
         @table.association(name)
+      when :associated_model
+        reflection = @table._scope.reflect_on_association(name)
+        if reflection.through_reflection?
+          ActiveRecord::LeftJoinProxy.new(
+            reflection.source_reflection.klass.joins(
+              reflection.through_reflection.name
+            ),
+            reflection
+          )
+        else
+          ActiveRecord::LeftJoinProxy.new(reflection.klass, reflection)
+        end
       when :column, :attribute
         @table[name]
       end
@@ -69,7 +90,7 @@ module BabySqueel
       case strategy
       when :column
         @table._scope.column_names.include?(name.to_s)
-      when :association
+      when :association, :associated_model
         !@table._scope.reflect_on_association(name).nil?
       when :function, :attribute
         true
@@ -82,7 +103,7 @@ module BabySqueel
       case strategy
       when :function
         !args.empty?
-      when :column, :attribute, :association
+      when :column, :attribute, :association, :associated_model
         args.empty?
       end
     end

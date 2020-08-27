@@ -35,6 +35,18 @@ module BabySqueel
           node
         end
       end
+      
+      # Unwraps left joins
+      def unwrap_left_joins(node)
+        case node
+        when Array
+          node.flatten.map {|child| unwrap_left_joins(child)}.flatten
+        when Association
+          node._left_joins_arel
+        else
+          []
+        end
+      end
     end
   end
 end

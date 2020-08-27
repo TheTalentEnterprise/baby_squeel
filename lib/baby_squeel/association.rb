@@ -4,7 +4,7 @@ module BabySqueel
   class Association < Relation
     # An Active Record association reflection
     attr_reader :_reflection
-
+    
     # Specifies the model that the polymorphic
     # association should join with
     attr_accessor :_polymorphic_klass
@@ -40,6 +40,24 @@ module BabySqueel
       self._scope = klass
       self._table = klass.arel_table
       self._polymorphic_klass = klass
+      self
+    end
+
+    def left_joining_to(name = nil, &block)
+      clone.left_joining_to!(name, &block)
+    end
+
+    def left_joining_to!(name = nil, &block)
+      target = AssociatedRelation.evaluate_ljoin_target(self._scope, name, &block)
+
+      if name
+        unless self._scope.kind_of?(NameAcquirer)
+          self._scope = NameAcquirer.new(self._scope)
+        end
+        self._scope.acquire_names(name => Table.new(target.arel_relation))
+      end
+      _acquire_left_join(target)
+
       self
     end
 
@@ -93,7 +111,18 @@ module BabySqueel
         @parent._arel([self, *associations])
       end
     end
+    
+    def _left_joins_arel
+      return [] unless @_left_joins.present?
+      AssociatedRelation.make_left_joins_arel(find_alias, @_left_joins)
+    end
 
+    protected
+    
+    def _acquire_left_join(associated_join)
+      (@_left_joins ||= []) << associated_join
+    end
+    
     private
 
     if ActiveRecord::VERSION::MAJOR >= 5

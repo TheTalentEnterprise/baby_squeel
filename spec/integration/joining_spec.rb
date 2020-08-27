@@ -150,8 +150,24 @@ describe '#joining' do
       end
 
       it 'outer joins' do
-        relation = Post.joining { author.outer.comments }
+        relation = Post.left_joining_to(:acomm) {
+          author.joining {comments}.selecting {
+            [name.as('author'), comments.body.as('content')]
+          }
+        }.selecting {
+          [title, acomm.author, acomm.content]
+        }
 
+        expect(relation).to match_sql_snapshot
+      end
+      
+      it 'outer joins a through association' do
+        relation = Post.left_joining_to(:acomm) {
+          author_comments
+        }.selecting {
+          [all_model_columns] + [acomm[:body].as('comment')]
+        }
+        
         expect(relation).to match_sql_snapshot
       end
 
@@ -195,7 +211,12 @@ describe '#joining' do
       end
 
       it 'joins a through association and then back again' do
-        relation = Post.joining { author.posts.author_comments.outer.post.author_comments }
+        # was: relation = Post.joining { author.posts.author_comments.outer.post.author_comments }
+        relation = Post.joining {
+          author.posts.left_joining_to {
+            author_comments.joining {post.author_comments}
+          }
+        }
 
         expect(relation).to match_sql_snapshot
       end

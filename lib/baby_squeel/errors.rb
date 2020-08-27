@@ -72,4 +72,13 @@ module BabySqueel
       super format(MESSAGE, name: name)
     end
   end
+  
+  class AssociationRequiredError < StandardError # :nodoc:
+    MESSAGE =
+      "An association is required, but a(n) %{type} was given"
+    
+    def initialize(type)
+      super format(MESSAGE, type: type.name.downcase)
+    end
+  end
 end

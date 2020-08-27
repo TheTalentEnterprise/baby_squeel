@@ -1,6 +1,7 @@
 require 'baby_squeel/nodes'
 require 'baby_squeel/relation'
 require 'baby_squeel/association'
+require 'baby_squeel/name_acquirer'
 
 module BabySqueel
   class DSL < Relation
@@ -88,7 +89,7 @@ module BabySqueel
     private
 
     def resolver
-      @resolver ||= Resolver.new(self, [:function, :column, :association])
+      @resolver ||= Resolver.new(self, [:function, :column, :association], NameAcquirer.names(_scope))
     end
   end
 end

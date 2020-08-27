@@ -4,6 +4,7 @@ module BabySqueel
   module ActiveRecord
     module Base
       delegate :joining,
+               :left_joining_to,
                :selecting,
                :ordering,
                :reordering,

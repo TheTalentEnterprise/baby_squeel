@@ -1,12 +1,26 @@
+require 'baby_squeel/associated_relation'
 require 'baby_squeel/dsl'
 require 'baby_squeel/join_dependency'
+require 'baby_squeel/name_acquirer'
 
 module BabySqueel
   module ActiveRecord
     module QueryMethods
       # Constructs Arel for ActiveRecord::QueryMethods#joins using the DSL.
       def joining(&block)
-        joins DSL.evaluate(self, &block)
+        raw_dsl_result = DSL.new(self).evaluate(&block)
+        joins(Nodes.unwrap raw_dsl_result).tap do |result|
+          result.joins!(Nodes.unwrap_left_joins raw_dsl_result)
+        end
+      end
+      
+      # Left-joins with a fully defined right-hand relation (to support explicit
+      # join association)
+      def left_joining_to(name = nil, &block)
+        rhs = AssociatedRelation.evaluate_ljoin(self, name, &block)
+        NameAcquirer.new(joins(rhs)).tap do |relation|
+          relation.acquire_names(name => Table.new(rhs.left)) if name
+        end
       end
 
       # Constructs Arel for ActiveRecord::QueryMethods#select using the DSL.

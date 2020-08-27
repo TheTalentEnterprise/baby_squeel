@@ -26,6 +26,7 @@ else
 end
 
 gem 'bump'
+gem 'colorize', require: false
 
 group :test do
   gem 'pry'

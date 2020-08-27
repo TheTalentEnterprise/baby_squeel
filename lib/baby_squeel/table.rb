@@ -16,6 +16,14 @@ module BabySqueel
       Nodes::Attribute.new(self, key)
     end
 
+    def all_model_columns
+      if resolver.allows? :column
+        self['*']
+      else
+        resolver.resolve!(:all_model_columns)
+      end
+    end
+
     def _join
       @_join ||= Arel::Nodes::InnerJoin
     end
