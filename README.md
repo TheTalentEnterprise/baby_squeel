@@ -167,10 +167,22 @@ Post.joining { author.comments.outer }
 # LEFT OUTER JOIN "posts" "posts_authors_join" ON "posts_authors_join"."author_id" = "authors"."id"
 # LEFT OUTER JOIN "comments" ON "comments"."post_id" = "posts_authors_join"."id"
 
-Post.joining { author.outer.posts }
+Post.left_joining_to { author.joining {comments} }
 # SELECT "posts".* FROM "posts"
-# LEFT OUTER JOIN "authors" ON "authors"."id" = "posts"."author_id"
-# INNER JOIN "posts" "posts_authors" ON "posts_authors"."author_id" = "authors"."id"
+# LEFT OUTER JOIN (
+#   SELECT "authors".*, "authors"."id" AS leftjoin_key FROM "authors"
+#   INNER JOIN "comments" ON "comments"."author_id" = "authors"."id"
+# ) author_ljoin ON author_ljoin."leftjoin_key" = "posts"."author_id"
+
+Post.left_joining_to(:post_author_comments) {
+  author.joining {comments}
+  .selecting {[name.as('author'), comments.body.as('comment')]}
+}.selecting {[title, post_author_comments.author, post_author_comments.comment]}
+# SELECT "posts"."title", post_author_comments."author", post_author_comments."comment" FROM "posts"
+# LEFT OUTER JOIN (
+#   SELECT "authors"."name" AS author, "comments"."body" AS comment, "authors"."id" AS leftjoin_key FROM "authors"
+#   INNER JOIN "comments" ON "comments"."author_id" = "authors"."id"
+# ) post_author_comments ON post_author_comments."leftjoin_key" = "posts"."author_id"
 
 Post.joining { author.on((author.id == author_id) | (author.name == title)) }
 # SELECT "posts".* FROM "posts"
