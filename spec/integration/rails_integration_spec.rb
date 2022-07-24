@@ -12,4 +12,10 @@ describe 'test that plain rails still works' do
 
     expect(relation).to match_sql_snapshot
   end
+
+  it 'joins includes' do
+    relation = Post.joins(:author).includes(:author).to_sql
+
+    expect(relation).to match_sql_snapshot
+  end
 end
