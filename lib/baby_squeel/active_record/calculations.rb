@@ -1,12 +1,10 @@
 require 'baby_squeel/calculation'
-require 'baby_squeel/pluck'
 
 module BabySqueel
   module ActiveRecord
     module Calculations
       def plucking(&block)
         nodes = Array.wrap(DSL.evaluate(self, &block))
-        nodes = nodes.map { |node| Pluck.decorate(node) }
         pluck(*nodes)
       end
 
@@ -38,17 +36,6 @@ module BabySqueel
           column_name.node
         else
           super
-        end
-      end
-
-      if ::ActiveRecord::VERSION::MAJOR < 5
-        # @override
-        def type_for(field)
-          if field.kind_of? Calculation
-            field
-          else
-            super
-          end
         end
       end
     end

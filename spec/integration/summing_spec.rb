@@ -35,7 +35,7 @@ describe '#summing' do
     end
 
     expect(queries.last).to produce_sql(
-      /SUM\("posts"."view_count"\) AS sum_posts_view_count/
+      /SUM\("posts"."view_count"\) AS "?sum_posts_view_count/
     )
   end
 end

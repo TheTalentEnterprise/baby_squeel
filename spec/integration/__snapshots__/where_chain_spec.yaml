@@ -14,21 +14,21 @@
   'Simp%' OR "authors"."name" = 'meatloaf')
 "#where.has wheres on deep associations 1": SELECT "posts".* FROM "posts" INNER JOIN
   "authors" ON "authors"."id" = "posts"."author_id" INNER JOIN "comments" ON "comments"."author_id"
-  = "authors"."id" WHERE ("comments"."id" > 0)
+  = "authors"."id" WHERE "comments"."id" > 0
 "#where.has wheres on an aliased association 1": SELECT "posts".* FROM "posts" INNER
   JOIN "authors" ON "authors"."id" = "posts"."author_id" INNER JOIN "posts" "posts_authors"
-  ON "posts_authors"."author_id" = "authors"."id" WHERE ("posts_authors"."id" > 0)
+  ON "posts_authors"."author_id" = "authors"."id" WHERE "posts_authors"."id" > 0
 "#where.has wheres on an aliased association with through 1": SELECT "posts".* FROM
   "posts" INNER JOIN "comments" ON "comments"."post_id" = "posts"."id" INNER JOIN
   "authors" ON "authors"."id" = "posts"."author_id" INNER JOIN "comments" "author_comments_posts"
-  ON "author_comments_posts"."author_id" = "authors"."id" WHERE ("author_comments_posts"."id"
-  > 0)
+  ON "author_comments_posts"."author_id" = "authors"."id" WHERE "author_comments_posts"."id"
+  > 0
 "#where.has wheres on polymorphic associations 1": SELECT "pictures".* FROM "pictures"
   INNER JOIN "posts" ON "posts"."id" = "pictures"."imageable_id" AND "pictures"."imageable_type"
-  = 'Post' WHERE ("posts"."title" LIKE 'meatloaf')
+  = 'Post' WHERE "posts"."title" LIKE 'meatloaf'
 "#where.has wheres on polymorphic associations outer join 1": SELECT "pictures".*
   FROM "pictures" LEFT OUTER JOIN "posts" ON "posts"."id" = "pictures"."imageable_id"
-  AND "pictures"."imageable_type" = 'Post' WHERE ("posts"."title" LIKE 'meatloaf')
+  AND "pictures"."imageable_type" = 'Post' WHERE "posts"."title" LIKE 'meatloaf'
 "#where.has wheres and correctly aliases 1": SELECT "posts".* FROM "posts" INNER JOIN
   "authors" ON "authors"."id" = "posts"."author_id" INNER JOIN "comments" ON "comments"."author_id"
   = "authors"."id" WHERE "comments"."id" IN (1, 2) AND "authors"."name" = 'Joe'
@@ -38,59 +38,26 @@
   = 'Joe'
 "#where.has wheres on an alias with a function 1": SELECT "posts".* FROM "posts" INNER
   JOIN "authors" ON "authors"."id" = "posts"."author_id" INNER JOIN "posts" "posts_authors"
-  ON "posts_authors"."author_id" = "authors"."id" WHERE (coalesce("posts_authors"."id",
-  1) > 0)
+  ON "posts_authors"."author_id" = "authors"."id" WHERE coalesce("posts_authors"."id",
+  1) > 0
 "#where.has wheres with a subquery 1": SELECT "posts".* FROM "posts" INNER JOIN "authors"
   ON "authors"."id" = "posts"."author_id" WHERE "authors"."id" IN (SELECT "authors"."id"
   FROM "authors" LIMIT 3)
 "#where.has wheres with an empty subquery 1": SELECT "posts".* FROM "posts" WHERE
   "posts"."author_id" IN (SELECT "authors"."id" FROM "authors" WHERE (1=0))
-"#where.has wheres with an empty subquery and keeps values 1 (Active Record: v4.2)": SELECT
-  "posts".* FROM "posts" WHERE "posts"."author_id" IN (SELECT "authors"."id" FROM
-  "authors" INNER JOIN "posts" ON "posts"."author_id" = "authors"."id" WHERE (1=0)
-  GROUP BY "authors"."id" ORDER BY "authors"."id" ASC)
-"#where.has wheres with a not in subquery 1": SELECT "posts".* FROM "posts" WHERE
-  ("posts"."author_id" NOT IN (SELECT "authors"."id" FROM "authors" WHERE (1=0)))
-"#where.has wheres using a simple table 1": SELECT "posts".* FROM "posts" INNER JOIN
-  "authors" ON "authors"."id" = "posts"."author_id" WHERE "authors"."name" = 'Yo Gotti'
-"#where.has builds an exists query 1": SELECT "posts".* FROM "posts" WHERE (EXISTS(SELECT
-  "posts".* FROM "posts" WHERE "posts"."author_id" = 1))
-"#where.has builds a not exists query 1": SELECT "posts".* FROM "posts" WHERE (NOT
-  EXISTS(SELECT "posts".* FROM "posts" WHERE "posts"."author_id" = 1))
 "#where.has wheres with an empty subquery and keeps values 1": SELECT "posts".* FROM
   "posts" WHERE "posts"."author_id" IN (SELECT "authors"."id" FROM "authors" INNER
   JOIN "posts" ON "posts"."author_id" = "authors"."id" WHERE (1=0) GROUP BY "authors"."id"
   ORDER BY "authors"."id" ASC)
+"#where.has wheres with a not in subquery 1": SELECT "posts".* FROM "posts" WHERE
+  "posts"."author_id" NOT IN (SELECT "authors"."id" FROM "authors" WHERE (1=0))
+"#where.has wheres using a simple table 1": SELECT "posts".* FROM "posts" INNER JOIN
+  "authors" ON "authors"."id" = "posts"."author_id" WHERE "authors"."name" = 'Yo Gotti'
+"#where.has builds an exists query 1": SELECT "posts".* FROM "posts" WHERE EXISTS(SELECT
+  "posts".* FROM "posts" WHERE "posts"."author_id" = 1)
+"#where.has builds a not exists query 1": SELECT "posts".* FROM "posts" WHERE NOT
+  EXISTS(SELECT "posts".* FROM "posts" WHERE "posts"."author_id" = 1)
 "#where.has wheres an association using #== 1": SELECT "posts".* FROM "posts" WHERE
-  ("posts"."author_id" = 42)
+  "posts"."author_id" = 42
 "#where.has wheres an association using #!= 1": SELECT "posts".* FROM "posts" WHERE
-  (("posts"."author_id" != 42))
-"#where.has wheres on deep associations 1 (Active Record: v5.2)": SELECT "posts".*
-  FROM "posts" INNER JOIN "authors" ON "authors"."id" = "posts"."author_id" INNER
-  JOIN "comments" ON "comments"."author_id" = "authors"."id" WHERE "comments"."id"
-  > 0
-"#where.has wheres on an aliased association 1 (Active Record: v5.2)": SELECT "posts".*
-  FROM "posts" INNER JOIN "authors" ON "authors"."id" = "posts"."author_id" INNER
-  JOIN "posts" "posts_authors" ON "posts_authors"."author_id" = "authors"."id" WHERE
-  "posts_authors"."id" > 0
-"#where.has wheres on an aliased association with through 1 (Active Record: v5.2)": SELECT
-  "posts".* FROM "posts" INNER JOIN "comments" ON "comments"."post_id" = "posts"."id"
-  INNER JOIN "authors" ON "authors"."id" = "posts"."author_id" INNER JOIN "comments"
-  "author_comments_posts" ON "author_comments_posts"."author_id" = "authors"."id"
-  WHERE "author_comments_posts"."id" > 0
-"#where.has wheres on an alias with a function 1 (Active Record: v5.2)": SELECT "posts".*
-  FROM "posts" INNER JOIN "authors" ON "authors"."id" = "posts"."author_id" INNER
-  JOIN "posts" "posts_authors" ON "posts_authors"."author_id" = "authors"."id" WHERE
-  coalesce("posts_authors"."id", 1) > 0
-"#where.has wheres with a not in subquery 1 (Active Record: v5.2)": SELECT "posts".*
-  FROM "posts" WHERE "posts"."author_id" NOT IN (SELECT "authors"."id" FROM "authors"
-  WHERE (1=0))
-"#where.has builds an exists query 1 (Active Record: v5.2)": SELECT "posts".* FROM
-  "posts" WHERE EXISTS(SELECT "posts".* FROM "posts" WHERE "posts"."author_id" = 1)
-"#where.has builds a not exists query 1 (Active Record: v5.2)": SELECT "posts".* FROM
-  "posts" WHERE NOT EXISTS(SELECT "posts".* FROM "posts" WHERE "posts"."author_id"
-  = 1)
-"#where.has wheres an association using #== 1 (Active Record: v5.2)": SELECT "posts".*
-  FROM "posts" WHERE "posts"."author_id" = 42
-"#where.has wheres an association using #!= 1 (Active Record: v5.2)": SELECT "posts".*
-  FROM "posts" WHERE "posts"."author_id" != 42
+  "posts"."author_id" != 42

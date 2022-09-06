@@ -1,7 +1,3 @@
 ---
-BabySqueel::Association#== generates SQL 1: '"posts"."author_id" = 42'
-BabySqueel::Association#!= generates SQL 1: ("posts"."author_id" != 42)
-'BabySqueel::Association#== generates SQL 1 (Active Record: v5.2)': '"posts"."author_id"
-  = ?'
-'BabySqueel::Association#!= generates SQL 1 (Active Record: v5.2)': '"posts"."author_id"
-  != ?'
+BabySqueel::Association#== generates SQL 1: '"posts"."author_id" = ?'
+BabySqueel::Association#!= generates SQL 1: '"posts"."author_id" != ?'

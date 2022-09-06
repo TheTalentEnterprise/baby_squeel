@@ -35,46 +35,30 @@ describe BabySqueel::Association do
   describe '#==' do
     subject(:association) { create_association Post, :author }
 
-    if ActiveRecord::VERSION::MAJOR >= 5
-      it 'generates SQL' do
-        node = association == Author.new(id: 42)
-        expect(node._arel.to_sql).to match_sql_snapshot(variants: ['5.2'])
-      end
+    it 'generates SQL' do
+      node = association == Author.new(id: 42)
+      expect(node._arel.to_sql).to match_sql_snapshot
+    end
 
-      it 'throws for an invalid comparison' do
-        expect {
-          association == 'foo'
-        }.to raise_error(BabySqueel::AssociationComparisonError)
-      end
-    else
-      it 'throws not supported' do
-        expect {
-          association == 'foo'
-        }.to raise_error(BabySqueel::AssociationComparisonNotSupportedError)
-      end
+    it 'throws for an invalid comparison' do
+      expect {
+        association == 'foo'
+      }.to raise_error(BabySqueel::AssociationComparisonError)
     end
   end
 
   describe '#!=' do
     subject(:association) { create_association Post, :author }
 
-    if ActiveRecord::VERSION::MAJOR >= 5
-      it 'generates SQL' do
-        node = association != Author.new(id: 42)
-        expect(node._arel.to_sql).to match_sql_snapshot(variants: ['5.2'])
-      end
+    it 'generates SQL' do
+      node = association != Author.new(id: 42)
+      expect(node._arel.to_sql).to match_sql_snapshot
+    end
 
-      it 'throws for an invalid comparison' do
-        expect {
-          association != 'foo'
-        }.to raise_error(BabySqueel::AssociationComparisonError)
-      end
-    else
-      it 'throws not supported' do
-        expect {
-          association != 'foo'
-        }.to raise_error(BabySqueel::AssociationComparisonNotSupportedError)
-      end
+    it 'throws for an invalid comparison' do
+      expect {
+        association != 'foo'
+      }.to raise_error(BabySqueel::AssociationComparisonError)
     end
   end
 

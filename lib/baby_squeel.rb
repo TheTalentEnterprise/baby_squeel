@@ -1,6 +1,11 @@
 require 'active_record'
 require 'active_record/relation'
-require 'polyamorous'
+begin
+  require 'polyamorous'
+rescue LoadError
+  # Trying loading from 'ransack' as of commit c9cc20de9 (post v2.3.2)
+  require 'polyamorous/polyamorous'
+end
 require 'baby_squeel/version'
 require 'baby_squeel/errors'
 require 'baby_squeel/active_record/base'

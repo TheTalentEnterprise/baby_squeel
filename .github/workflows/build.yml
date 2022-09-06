@@ -1,0 +1,41 @@
+name: Build
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Active Record ${{ matrix.activerecord }} on ruby ${{ matrix.ruby }} (compat=${{ matrix.compat }})
+    strategy:
+      matrix:
+        activerecord: ["~> 6.0", "~> 6.1", "~> 7.0"]
+        compat: ["0", "1"]
+        ruby: [ "2.6", "2.7", "3.0", "3.1"]
+        exclude:
+          - activerecord: "~> 7.0"
+            ruby: "2.6"
+    env:
+      AR: ${{ matrix.activerecord }}
+      COMPAT: ${{ matrix.compat }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+
+      - name: Install packages
+        run: sudo apt-get install libsqlite3-dev
+
+      - name: Install bundler
+        run: gem install bundler
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Test
+        run: bundle exec rspec

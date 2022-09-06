@@ -34,7 +34,7 @@ describe BabySqueel::ActiveRecord::Base, '#sifter' do
       author.sift :boogers
     }
 
-    expect(relation).to match_sql_snapshot(variants: ['5.2'])
+    expect(relation).to match_sql_snapshot
   end
 
   it 'yield the root table to the block when arity is given' do
@@ -42,6 +42,6 @@ describe BabySqueel::ActiveRecord::Base, '#sifter' do
       sift :author_comments_id, 1
     }
 
-    expect(relation).to match_sql_snapshot(variants: ['5.2'])
+    expect(relation).to match_sql_snapshot
   end
 end

@@ -36,7 +36,7 @@ describe '#averaging' do
     end
 
     expect(queries.last).to produce_sql(
-      /AVG\("posts"."view_count"\) AS average_posts_view_count/
+      /AVG\("posts"."view_count"\) AS "?average_posts_view_count/
     )
   end
 end

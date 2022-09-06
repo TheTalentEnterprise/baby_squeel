@@ -10,13 +10,6 @@ RSpec.describe BabySqueel::Calculation do
     end
   end
 
-  describe '#type_cast_from_database' do
-    it 'just returns what you pass in' do
-      calculation = described_class.new(table[:id])
-      expect(calculation.type_cast_from_database(1)).to eq(1)
-    end
-  end
-
   describe '#to_s' do
     it 'generates a name for attribute' do
       calculation = described_class.new(table[:id])

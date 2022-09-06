@@ -73,7 +73,7 @@ describe '#joining' do
     it 'merges bind values' do
       relation = Post.joining { ugly_author_comments }
 
-      expect(relation).to match_sql_snapshot
+      expect(relation).to match_sql_snapshot(variants: ['6.0', '6.1', '7.0'])
     end
 
     context 'with complex conditions' do
@@ -102,13 +102,31 @@ describe '#joining' do
   context 'when joining implicitly' do
     it 'inner joins' do
       relation = Post.joining { author }
+
+      expect(relation).to match_sql_snapshot
       expect(relation).to produce_sql(Post.joins(:author))
     end
 
-    it 'outer joins' do
-      relation = Post.joining { author.outer }
+    context 'outer joins' do
+      it 'single' do
+        relation = Post.joining { author.outer }
 
-      expect(relation).to match_sql_snapshot
+        expect(relation).to match_sql_snapshot
+        expect(relation).to produce_sql(Post.left_joins(:author))
+      end
+
+      it 'multi' do
+        relation = Post.joining { parent.outer }.joining { author.outer }
+
+        expect(relation).to match_sql_snapshot
+        expect(relation).to produce_sql(Post.joining { [parent.outer, author.outer] })
+        expect(relation).to produce_sql(Post.left_joins(:parent).left_joins(:author))
+        expect(relation).to produce_sql(Post.joining { parent.outer }.left_joins(:author))
+
+        # The order is different left_joins are at the end
+        relation = Post.joining { [author.outer, parent.outer] }
+        expect(relation).to produce_sql(Post.left_joins(:parent).joining { author.outer })
+      end
     end
 
     it 'correctly aliases when joining the same table twice' do
@@ -122,21 +140,20 @@ describe '#joining' do
 
     describe 'polymorphism' do
       it 'inner joins' do
-        if ActiveRecord::VERSION::STRING >= '5.2.0'
-          pending "polyamorous's support for polymorphism is broken"
-        end
-
         relation = Picture.joining { imageable.of(Post) }
 
         expect(relation).to match_sql_snapshot
       end
 
       it 'outer joins' do
-        if ActiveRecord::VERSION::STRING >= '5.2.0'
-          pending "polyamorous's support for polymorphism is broken"
-        end
-
         relation = Picture.joining { imageable.of(Post).outer }
+
+        expect(relation).to match_sql_snapshot
+      end
+
+      it 'double polymorphic joining' do
+        join_scope = Picture.joining { [imageable.of(Author), imageable.of(Post)] }
+        relation = join_scope.where.has { imageable.of(Author).name.eq('NameOfTheAuthor').or(imageable.of(Post).title.eq('NameOfThePost')) }
 
         expect(relation).to match_sql_snapshot
       end
@@ -155,19 +172,18 @@ describe '#joining' do
         relation = Post.joining { author.comments }
 
         expect(relation).to match_sql_snapshot
+        expect(relation).to produce_sql(Post.joins(author: :comments))
       end
 
       it 'outer joins' do
+        pending "This feature is known to be broken"
+
         relation = Post.joining { author.outer.comments }
 
         expect(relation).to match_sql_snapshot
       end
 
       it 'handles polymorphism' do
-        if ActiveRecord::VERSION::STRING >= '5.2.0'
-          pending "polyamorous's support for polymorphism is broken"
-        end
-
         relation = Picture.joining { imageable.of(Post).comments }
 
         expect(relation).to match_sql_snapshot
@@ -177,6 +193,7 @@ describe '#joining' do
         relation = Post.joining { author.outer.comments.outer }
 
         expect(relation).to match_sql_snapshot
+        expect(relation).to produce_sql(Post.left_joins(author: :comments))
       end
 
       it 'outer joins only the specified associations' do
@@ -188,6 +205,7 @@ describe '#joining' do
       it 'joins back with a new alias' do
         baby_squeel = Post.joining { author.posts }
         active_record = Post.joins(author: :posts)
+
         expect(baby_squeel).to produce_sql(active_record)
       end
 
@@ -202,11 +220,13 @@ describe '#joining' do
 
       it 'joins a through association' do
         baby_squeel = Post.joining { author.posts.author_comments }
-        active_record = Post.joins(author: { posts: :author_comments})
+        active_record = Post.joins(author: { posts: :author_comments })
         expect(baby_squeel).to produce_sql(active_record)
       end
 
       it 'joins a through association and then back again' do
+        pending "This feature is known to be broken"
+
         relation = Post.joining { author.posts.author_comments.outer.post.author_comments }
 
         expect(relation).to match_sql_snapshot
@@ -295,6 +315,16 @@ describe '#joining' do
       expect {
         Post.joining { author.outer.alias('a') }.to_sql
       }.to raise_error(BabySqueel::AssociationAliasingError, /'author' as 'a'/)
+    end
+
+    it "correctly identifies a table independenty joined via separate associations" do
+      relation = Post
+      relation = relation.joining { [author, comments.author] }
+      relation = relation.where.has {
+        comments.author.name == 'Bob'
+      }
+
+      expect(relation.to_sql).to match_sql_snapshot
     end
   end
 end

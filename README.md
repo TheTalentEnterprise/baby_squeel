@@ -1,10 +1,7 @@
 # BabySqueel 🐷
 
-[![Build Status](https://travis-ci.org/rzane/baby_squeel.svg?branch=master)](https://travis-ci.org/rzane/baby_squeel)
-[![Code Climate](https://codeclimate.com/github/rzane/baby_squeel/badges/gpa.svg)](https://codeclimate.com/github/rzane/baby_squeel)
-[![Coverage Status](https://coveralls.io/repos/github/rzane/baby_squeel/badge.svg?branch=master)](https://coveralls.io/github/rzane/baby_squeel?branch=master)
-
-<img align="right" src="http://static.thefrisky.com/uploads/2010/07/01/pig_in_boots_070110_m.jpg" alt="biddy piggy">
+![Build](https://github.com/rzane/baby_squeel/workflows/Build/badge.svg)
+![Version](https://img.shields.io/gem/v/baby_squeel)
 
 Have you ever used the [Squeel](https://github.com/activerecord-hackery/squeel) gem? It's a really nice way to build complex queries. However, Squeel monkeypatches Active Record internals, because it was aimed at enhancing the existing API with the aim of inclusion into Rails. However, that inclusion never happened, and it left Squeel susceptible to breakage from arbitrary changes in Active Record, eventually burning out the maintainer.
 
@@ -258,6 +255,7 @@ Post.joining {
 ##### Polymorphism
 
 Given this polymorphism:
+
 ```ruby
 # app/models/picture.rb
 belongs_to :imageable, polymorphic: true
@@ -267,6 +265,7 @@ has_many :pictures, as: :imageable
 ```
 
 The query might look like this:
+
 ```ruby
 Picture.
   joining { imageable.of(Post) }.
@@ -316,7 +315,7 @@ Post.joins(:author).where.has {
 The following methods give you access to BabySqueel's DSL:
 
 | BabySqueel    | Active Record Equivalent |
-|---------------|--------------------------|
+| ------------- | ------------------------ |
 | `selecting`   | `select`                 |
 | `ordering`    | `order`                  |
 | `joining`     | `joins`                  |
@@ -330,7 +329,7 @@ Check out the [migration guide](https://github.com/rzane/baby_squeel/wiki/Migrat
 
 ## Development
 
-1. Pick an Active Record version to develop against, then export it: `export AR=4.2.6`.
+1. Pick an Active Record version to develop against, then export it: `export AR=6.1.4`.
 2. Run `bin/setup` to install dependencies.
 3. Run `rake` to run the specs.
 

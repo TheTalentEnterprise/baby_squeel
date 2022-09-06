@@ -35,7 +35,7 @@ describe '#minimizing' do
     end
 
     expect(queries.last).to produce_sql(
-      /MIN\("posts"."view_count"\) AS minimum_posts_view_count/
+      /MIN\("posts"."view_count"\) AS "?minimum_posts_view_count/
     )
   end
 end

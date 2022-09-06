@@ -8,11 +8,8 @@ module Matchers
   end
 
   def self.suffix(variants: [])
-    version = ActiveRecord::VERSION::STRING
-    version = version.split('.').first(2).join('.')
-
     variant = variants.find do |variant|
-      variant === version
+      ActiveRecord::VERSION::STRING.start_with?(variant)
     end
 
     "(Active Record: v#{variant})" if variant

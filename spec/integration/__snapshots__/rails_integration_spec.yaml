@@ -1,0 +1,14 @@
+---
+test that plain rails still works joins and merge 1: SELECT "authors".* FROM "authors"
+  INNER JOIN "posts" ON "posts"."author_id" = "authors"."id" INNER JOIN "comments"
+  ON "comments"."post_id" = "posts"."id" WHERE "comments"."body" = 'body'
+test that plain rails still works left_joins 1: SELECT "posts".* FROM "posts" LEFT
+  OUTER JOIN "posts" "parents_posts" ON "parents_posts"."id" = "posts"."parent_id"
+  LEFT OUTER JOIN "authors" ON "authors"."id" = "posts"."author_id"
+test that plain rails still works joins includes 1: SELECT "posts"."id" AS t0_r0,
+  "posts"."title" AS t0_r1, "posts"."author_id" AS t0_r2, "posts"."published_at" AS
+  t0_r3, "posts"."view_count" AS t0_r4, "posts"."parent_id" AS t0_r5, "posts"."created_at"
+  AS t0_r6, "posts"."updated_at" AS t0_r7, "authors"."id" AS t1_r0, "authors"."name"
+  AS t1_r1, "authors"."age" AS t1_r2, "authors"."ugly" AS t1_r3, "authors"."created_at"
+  AS t1_r4, "authors"."updated_at" AS t1_r5 FROM "posts" INNER JOIN "authors" ON "authors"."id"
+  = "posts"."author_id"

@@ -41,7 +41,7 @@ describe '#counting' do
     end
 
     expect(queries.last).to produce_sql(
-      /COUNT\("posts"."id"\) AS count_posts_id/
+      /COUNT\("posts"."id"\) AS "?count_posts_id/
     )
   end
 end

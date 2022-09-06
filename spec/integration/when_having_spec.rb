@@ -6,7 +6,7 @@ describe '#when_having' do
                    .grouping { author_id }
                    .when_having { id.count > 5 }
 
-    expect(relation).to match_sql_snapshot(variants: ['4.2', '5.2'])
+    expect(relation).to match_sql_snapshot
   end
 
   it 'adds a having clause with a calculation' do
@@ -14,7 +14,7 @@ describe '#when_having' do
                    .grouping { (author_id + 5 ) * 3 }
                    .when_having { id.count > 5 }
 
-    expect(relation).to match_sql_snapshot(variants: ['4.2', '5.2'])
+    expect(relation).to match_sql_snapshot
   end
 
   it 'adds a having clause with an association' do
@@ -23,7 +23,7 @@ describe '#when_having' do
                    .grouping { author.id }
                    .when_having { author.id.count > 5 }
 
-    expect(relation).to match_sql_snapshot(variants: ['4.2', '5.2'])
+    expect(relation).to match_sql_snapshot
   end
 
   it 'adds a having clause with an aliased table' do
@@ -32,6 +32,6 @@ describe '#when_having' do
                    .grouping { author.posts.id }
                    .when_having { author.posts.id.count > 5 }
 
-    expect(relation).to match_sql_snapshot(variants: ['4.2', '5.2'])
+    expect(relation).to match_sql_snapshot
   end
 end

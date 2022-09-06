@@ -35,7 +35,7 @@ describe '#maximizing' do
     end
 
     expect(queries.last).to produce_sql(
-      /MAX\("posts"."view_count"\) AS maximum_posts_view_count/
+      /MAX\("posts"."view_count"\) AS "?maximum_posts_view_count/
     )
   end
 end

@@ -1,16 +1,9 @@
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
-
 require 'bundler/setup'
-Bundler.require :test
+require 'simplecov'
+require 'pry'
+require 'byebug'
 
-SimpleCov.formatter =
-  if ENV['CI']
-    SimpleCov.formatter = Coveralls::SimpleCov::Formatter
-  else
-    SimpleCov::Formatter::HTMLFormatter
-  end
-
-SimpleCov.start { add_filter 'spec/' } unless ENV['SKIPCOV']
+SimpleCov.start { add_filter 'spec/' }
 
 require 'baby_squeel'
 require 'support/schema'
@@ -28,12 +21,12 @@ RSpec.configure do |config|
   config.default_formatter = config.files_to_run.one? ? :doc : :progress
   config.run_all_when_everything_filtered = true
   config.example_status_persistence_file_path = 'tmp/spec-results.log'
-  config.filter_run_excluding compat: !ENV['COMPAT']
+  config.filter_run_excluding compat: ENV['COMPAT'] != "1"
 
   config.before :suite do
     puts "\nRunning with ActiveRecord #{ActiveRecord::VERSION::STRING}"
 
-    if ENV['COMPAT']
+    if ENV['COMPAT'] == "1"
       puts "Running in Squeel Compatibility mode"
       BabySqueel.enable_compatibility!
     end
