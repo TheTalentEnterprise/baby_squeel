@@ -41,7 +41,7 @@ module BabySqueel
       # Conveniently, this approach automatically adds a 1=0.
       # I have literally no idea why, but I'll take it.
       def sanitize_relation(rel)
-        if rel.kind_of? ::ActiveRecord::NullRelation
+        if ::ActiveRecord::VERSION::MAJOR < 7 && rel.kind_of?(::ActiveRecord::NullRelation)
           other = rel.spawn
           other.extending_values -= [::ActiveRecord::NullRelation]
           sanitize_relation rel.unscoped.merge(other)

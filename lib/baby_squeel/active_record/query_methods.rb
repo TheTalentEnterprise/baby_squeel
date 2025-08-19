@@ -51,34 +51,22 @@ module BabySqueel
         having DSL.evaluate(self, &block)
       end
 
-      if BabySqueel::ActiveRecord::VersionHelper.at_least_6_1?
-        def construct_join_dependency(associations, join_type)
-          result = super(associations, join_type)
-          if associations.any? { |assoc| assoc.is_a?(BabySqueel::Join) }
-            result.extend(BabySqueel::JoinDependency::Injector6_1)
-          end
-          result
+      def construct_join_dependency(associations, join_type)
+        result = super(associations, join_type)
+        if associations.any? { |assoc| assoc.is_a?(BabySqueel::Join) }
+          result.extend(BabySqueel::JoinDependency::Injector6_1)
         end
+        result
+      end
 
-        private
+      private
 
-        # https://github.com/rails/rails/commit/c0c53ee9d28134757cf1418521cb97c4a135f140
-        def select_association_list(*args)
-          if args[0].any? { |join| join.is_a?(BabySqueel::Join) }
-            args[0].extend(BabySqueel::ActiveRecord::QueryMethods::Injector6_1)
-          end
-          super *args
+      # https://github.com/rails/rails/commit/c0c53ee9d28134757cf1418521cb97c4a135f140
+      def select_association_list(*args)
+        if args[0].any? { |join| join.is_a?(BabySqueel::Join) }
+          args[0].extend(BabySqueel::ActiveRecord::QueryMethods::Injector6_1)
         end
-      else
-        private
-
-        # Active Record will call `each` on the `joins`. The
-        # Injector has a custom `each` method that handles
-        # BabySqueel::Join nodes.
-        def build_joins(*args)
-          args[1] = BabySqueel::JoinDependency::Injector6_0.new(args.second)
-          super(*args)
-        end
+        super *args
       end
     end
   end

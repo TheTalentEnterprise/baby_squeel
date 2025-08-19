@@ -12,7 +12,12 @@ require 'support/matchers'
 require 'support/factories'
 require 'support/query_tracker'
 
-ActiveSupport::Deprecation.behavior = :raise
+if ActiveSupport.respond_to?(:deprecator)
+  ActiveSupport.deprecator.behavior = :raise
+  ActiveRecord.deprecator.behavior = :raise
+else
+  ActiveSupport::Deprecation.behavior = :raise
+end
 
 RSpec.configure do |config|
   config.include Factories

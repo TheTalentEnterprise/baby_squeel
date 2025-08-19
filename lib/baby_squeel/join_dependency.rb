@@ -46,20 +46,13 @@ module BabySqueel
       # a list (in order of chaining) of associations and finding
       # the respective JoinAssociation at each level.
       def find_alias(associations)
-        if BabySqueel::ActiveRecord::VersionHelper.at_least_6_1?
-          # construct_tables! got removed by rails
-          # https://github.com/rails/rails/commit/590b045ee2c0906ff162e6658a184afb201865d7
-          #
-          # construct_tables_for_association! is a method from the polyamorous (ransack) gem
-          join_root = join_dependency.send(:join_root)
-          join_root.each_children do |parent, child|
-            join_dependency.construct_tables_for_association!(parent, child)
-          end
-        else
-          # If we tell join_dependency to construct its tables, Active Record
-          # handles building the correct aliases and attaching them to its
-          # JoinDepenencies.
-          join_dependency.send(:construct_tables!, join_dependency.send(:join_root))
+        # construct_tables! got removed by rails
+        # https://github.com/rails/rails/commit/590b045ee2c0906ff162e6658a184afb201865d7
+        #
+        # construct_tables_for_association! is a method from the polyamorous (ransack) gem
+        join_root = join_dependency.send(:join_root)
+        join_root.each_children do |parent, child|
+          join_dependency.construct_tables_for_association!(parent, child)
         end
 
         join_association = find_join_association(associations)
@@ -95,7 +88,7 @@ module BabySqueel
         joins += relation.joins_values
         joins += relation.left_outer_joins_values
 
-        buckets = joins.group_by do |join|
+        _buckets = joins.group_by do |join|
           case join
           when String
             :string_join

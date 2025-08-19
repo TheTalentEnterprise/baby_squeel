@@ -29,9 +29,6 @@
   JOIN "authors" "a" ON "authors"."id" = "posts"."author_id"
 "#joining when joining explicitly aliases after the on clause 1": SELECT "posts".*
   FROM "posts" INNER JOIN "authors" "a" ON "authors"."id" = "posts"."author_id"
-"#joining when joining explicitly merges bind values 1": SELECT "posts".* FROM "posts"
-  INNER JOIN "authors" ON "authors"."ugly" = 't' AND "authors"."id" = "posts"."author_id"
-  INNER JOIN "comments" ON "comments"."author_id" = "authors"."id"
 "#joining when joining explicitly with complex conditions inner joins 1": SELECT "posts".*
   FROM "posts" INNER JOIN "authors" ON ("posts"."author_id" = "authors"."id" AND "authors"."id"
   != 5 OR "authors"."name" IS NULL)
@@ -94,20 +91,11 @@
 : SELECT "posts".* FROM "posts" INNER JOIN "authors" ON "authors"."id" = "posts"."author_id"
   LEFT OUTER JOIN "comments" ON "comments"."author_id" = "authors"."id" INNER JOIN
   "authors" "authors_posts" ON "authors_posts"."id" = "posts"."author_id"
-"#joining when joining explicitly merges bind values 1 (Active Record: v6.0)": SELECT
-  "posts".* FROM "posts" INNER JOIN "authors" ON "authors"."ugly" = 1 AND "authors"."id"
-  = "posts"."author_id" INNER JOIN "comments" ON "comments"."author_id" = "authors"."id"
 "#joining when joining implicitly polymorphism double polymorphic joining 1": SELECT
   "pictures".* FROM "pictures" INNER JOIN "authors" ON "authors"."id" = "pictures"."imageable_id"
   AND "pictures"."imageable_type" = 'Author' INNER JOIN "posts" ON "posts"."id" =
   "pictures"."imageable_id" AND "pictures"."imageable_type" = 'Post' WHERE ("authors"."name"
   = 'NameOfTheAuthor' OR "posts"."title" = 'NameOfThePost')
-"#joining when joining explicitly merges bind values 1 (Active Record: v6.1)": SELECT
-  "posts".* FROM "posts" INNER JOIN "authors" ON "authors"."ugly" = 1 AND "authors"."id"
-  = "posts"."author_id" INNER JOIN "comments" ON "comments"."author_id" = "authors"."id"
-"#joining when joining explicitly merges bind values 1 (Active Record: v7.0)": SELECT
-  "posts".* FROM "posts" INNER JOIN "authors" ON "authors"."ugly" = 1 AND "authors"."id"
-  = "posts"."author_id" INNER JOIN "comments" ON "comments"."author_id" = "authors"."id"
 "#joining when joining implicitly inner joins 1": SELECT "posts".* FROM "posts" INNER
   JOIN "authors" ON "authors"."id" = "posts"."author_id"
 "#joining when joining implicitly outer joins single 1": SELECT "posts".* FROM "posts"
@@ -115,3 +103,6 @@
 "#joining when joining implicitly outer joins multi 1": SELECT "posts".* FROM "posts"
   LEFT OUTER JOIN "posts" "parents_posts" ON "parents_posts"."id" = "posts"."parent_id"
   LEFT OUTER JOIN "authors" ON "authors"."id" = "posts"."author_id"
+"#joining when joining explicitly merges bind values 1": SELECT "posts".* FROM "posts"
+  INNER JOIN "authors" ON "authors"."ugly" = 1 AND "authors"."id" = "posts"."author_id"
+  INNER JOIN "comments" ON "comments"."author_id" = "authors"."id"
