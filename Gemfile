@@ -29,7 +29,7 @@ else
   end
 end
 
-gem 'sqlite3', '~> 1.4'
+gem 'sqlite3', '>= 1.4'
 
 case ENV.fetch('RANSACK', 'latest')
 when 'latest'
