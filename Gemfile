@@ -1,32 +1,25 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in baby_squeel.gemspec
+# Load gemspec dependencies
 gemspec
 
-case ENV.fetch('AR', 'latest')
-when 'latest'
-  gem 'activerecord'
-  gem 'sqlite3', '~> 1.4'
-when 'master'
-  gem 'activerecord', github: 'rails/rails'
-  gem 'sqlite3', '~> 1.4'
-else
-  gem 'activerecord', ENV['AR']
+ar_version = ENV.fetch('AR', 'latest')
 
-  gem 'sqlite3', '~> 1.4'
+if ar_version == 'master'
+  gem 'activerecord', github: 'rails/rails'
+elsif ar_version == 'latest'
+  gem 'activerecord'
+else
+  gem 'activerecord', ar_version
 end
 
-case ENV.fetch('RANSACK', 'latest')
-when 'latest'
-  gem 'ransack', require: false
-when 'master'
+gem 'sqlite3', '~> 2.2'
+
+ransack_version = ENV.fetch('RANSACK', 'latest')
+if ransack_version == 'master'
   gem 'ransack', github: 'activerecord-hackery/ransack', require: false
 else
-  ENV['RANSACK'].split('#').tap do |repo, branch|
-    opts = {git: repo, require: false}
-    opts[:branch] = branch if branch
-    gem 'ransack', opts
-  end
+  gem 'ransack', require: false
 end
 
 gem 'bump'
